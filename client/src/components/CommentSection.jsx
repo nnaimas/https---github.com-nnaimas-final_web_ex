@@ -49,11 +49,13 @@ function CommentSection({ photoId, onCommentAdded }) {
         text: comment.trim()
       });
 
-      setComments(prev => [response.data, ...prev]);
-      setComment('');
-      setError('');
-      if (onCommentAdded) {
-        onCommentAdded(response.data);
+      if (response.data) {
+        setComments(prev => [response.data, ...prev]);
+        setComment('');
+        setError('');
+        if (onCommentAdded) {
+          onCommentAdded(response.data);
+        }
       }
     } catch (error) {
       console.error('Comment error:', error);

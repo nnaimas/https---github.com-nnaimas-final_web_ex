@@ -20,7 +20,7 @@ const commentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add indexes for better query performance
+// Add indexes
 commentSchema.index({ photo: 1, createdAt: -1 });
 commentSchema.index({ user: 1 });
 

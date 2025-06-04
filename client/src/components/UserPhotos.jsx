@@ -24,18 +24,25 @@ function UserPhotos() {
 
   const fetchPhotos = async () => {
     try {
-      const response = await axios.get(`/photosOfUser/${userId}`);
+      console.log('Fetching photos for user:', userId);
+      const response = await axios.get(`/photos/user/${userId}`);
+      console.log('Photos response:', response.data);
+      if (!response.data) {
+        throw new Error('No data received from server');
+      }
       setPhotos(response.data);
       setError('');
     } catch (error) {
       console.error('Error fetching photos:', error);
-      setError('Không thể tải ảnh');
+      setError(error.response?.data?.error || 'Không thể tải ảnh. Vui lòng thử lại sau.');
+      setPhotos([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    console.log('UserPhotos component mounted with userId:', userId);
     fetchPhotos();
   }, [userId]);
 
@@ -43,11 +50,14 @@ function UserPhotos() {
     setPhotos(prevPhotos => [newPhoto, ...prevPhotos]);
   };
 
-  const handleCommentAdded = (photoId, newComment) => {
+  const handleCommentAdded = (newComment) => {
     setPhotos(prevPhotos => 
       prevPhotos.map(photo => 
-        photo._id === photoId 
-          ? { ...photo, comments: [...photo.comments, newComment] }
+        photo._id === newComment.photo_id 
+          ? { 
+              ...photo, 
+              comments: [newComment, ...(photo.comments || [])]
+            }
           : photo
       )
     );
@@ -61,16 +71,34 @@ function UserPhotos() {
     );
   }
 
+  if (error) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, p: 3, bgcolor: 'error.light', borderRadius: 2 }}>
+          <Typography color="error" variant="h6">
+            {error}
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!photos || photos.length === 0) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, p: 3, bgcolor: 'info.light', borderRadius: 2 }}>
+          <Typography variant="h6" color="text.secondary">
+            Chưa có ảnh nào được đăng
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg">
       {user && user._id === userId && (
         <PhotoUpload userId={userId} onUploadSuccess={handleUploadSuccess} />
-      )}
-
-      {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
       )}
 
       <Grid container spacing={3}>
@@ -108,7 +136,7 @@ function UserPhotos() {
                 <CommentSection 
                   photoId={photo._id}
                   comments={photo.comments}
-                  onCommentAdded={(newComment) => handleCommentAdded(photo._id, newComment)}
+                  onCommentAdded={(newComment) => handleCommentAdded(newComment)}
                 />
               </CardContent>
             </Card>
