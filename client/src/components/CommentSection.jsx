@@ -45,8 +45,8 @@ function CommentSection({ photoId, onCommentAdded }) {
 
     try {
       const response = await axios.post('/comments', {
-        photoId: photoId,
-        text: comment.trim()
+        comment: comment.trim(),
+        photo_id: photoId
       });
 
       if (response.data) {
