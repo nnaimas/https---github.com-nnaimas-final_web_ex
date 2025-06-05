@@ -96,12 +96,14 @@ const authRoutes = require('./routes/auth');
 const photoRoutes = require('./routes/photos');
 const commentRoutes = require('./routes/comments');
 const userRoutes = require('./routes/users');
+const likeRoutes = require('./routes/likes');
 
 // Use routes
 app.use('/admin', authRoutes);
 app.use('/photos', photoRoutes);
 app.use('/comments', commentRoutes);
 app.use('/user', userRoutes);
+app.use('/likes', likeRoutes);
 
 // Start server
 app.listen(port, () => {

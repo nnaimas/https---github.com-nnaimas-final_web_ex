@@ -25,6 +25,12 @@ photoSchema.virtual('comments', {
   foreignField: 'photo',
 });
 
+photoSchema.virtual('likes', {
+  ref: 'Like',
+  localField: '_id',
+  foreignField: 'photo',
+});
+
 photoSchema.set('toObject', { virtuals: true });
 photoSchema.set('toJSON', { virtuals: true });
 

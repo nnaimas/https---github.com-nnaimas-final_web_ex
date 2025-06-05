@@ -8,8 +8,10 @@ import {
   CardContent,
   Typography,
   Box,
-  CircularProgress
+  CircularProgress,
+  Button
 } from '@mui/material';
+import { Favorite } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import PhotoUpload from './PhotoUpload';
@@ -24,9 +26,7 @@ function UserPhotos() {
 
   const fetchPhotos = async () => {
     try {
-      console.log('Fetching photos for user:', userId);
       const response = await axios.get(`/photos/user/${userId}`);
-      console.log('Photos response:', response.data);
       if (!response.data) {
         throw new Error('No data received from server');
       }
@@ -42,7 +42,6 @@ function UserPhotos() {
   };
 
   useEffect(() => {
-    console.log('UserPhotos component mounted with userId:', userId);
     fetchPhotos();
   }, [userId]);
 
@@ -61,6 +60,15 @@ function UserPhotos() {
           : photo
       )
     );
+  };
+
+  const handleLike = async (photoId) => {
+    try {
+      await axios.post(`/likes/${photoId}`);
+      fetchPhotos(); // Refresh photos to get updated like count
+    } catch (error) {
+      console.error('Error liking photo:', error);
+    }
   };
 
   if (loading) {
@@ -126,6 +134,21 @@ function UserPhotos() {
                 }}
               />
               <CardContent>
+                <Button
+                  variant="contained"
+                  startIcon={<Favorite />}
+                  onClick={() => handleLike(photo._id)}
+                  sx={{
+                    bgcolor: '#ff4081',
+                    '&:hover': {
+                      bgcolor: '#f50057'
+                    },
+                    mb: 2
+                  }}
+                >
+                  Thích ({photo.likes?.length || 0})
+                </Button>
+
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                   {photo.description || 'Không có chú thích'}
                 </Typography>
